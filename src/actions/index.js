@@ -37,3 +37,13 @@ export function updateNote(noteParams){
     }
   }
 }
+
+export function destroyNote(noteId) {
+  const note = axios.delete(`http://localhost:3000/api/v1/notes/${noteId}`)
+            .then(response => response.data)
+
+  return {
+    type: 'DELETE_NOTE',
+    payload: note
+  }
+}

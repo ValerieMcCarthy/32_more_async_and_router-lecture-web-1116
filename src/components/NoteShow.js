@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { browserHistory } from 'react-router';
+var Router = require('react-router')
 
-import { updateNote } from '../actions/'
+import { updateNote , destroyNote } from '../actions/'
 
 class NoteShow extends Component {
 
@@ -24,6 +26,12 @@ class NoteShow extends Component {
     //  3. Our reducer needs to be able to respond to that action type...
   }
 
+  handleDestroy(event) {
+    event.preventDefault()
+    this.props.destroyNote(this.props.note.id)
+    Router.browserHistory.push('/notes')
+  }
+
   render(){
     if ( !this.props.note ) {
       return (<div>Select or Add a Note to get started...</div>)
@@ -33,12 +41,19 @@ class NoteShow extends Component {
       <div>
         <h2>{ this.props.note.title }</h2>
         < input type='text' value={ this.props.note.body } onChange={this.handleChange.bind(this)}/>
+        <br></br>
+        <button onClick={this.handleDestroy.bind(this)}>Destroy</button>
       </div>)
   }
 }
 
 function mapStateToProps(state, ownProps){
-  const note = state.notes.find( note => note.id === state.currentNote )
+  let note
+  if (state.currentNote) {
+    note = state.notes.find( note => note.id === state.currentNote )
+  } else {
+    note = state.notes.find( note => note.id == ownProps.params.id )
+  }
 
   return {
     note: note
@@ -49,6 +64,10 @@ function mapDispatchToProps(dispatch){
   return {
     updateNote: function(noteParams){
       let action = updateNote( noteParams )
+      dispatch(action)
+    },
+    destroyNote: function(noteId) {
+      let action = destroyNote(noteId)
       dispatch(action)
     }
   }
